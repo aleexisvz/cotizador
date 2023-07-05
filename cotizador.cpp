@@ -105,7 +105,7 @@ Sticker Cotizador::crearSticker() {
 }
 
 string Cotizador::obtenerPath() {
-    // Obtenemos el path del archivo
+    // Obtenemos el path actual
     char buffer[MAX_PATH];
     GetCurrentDirectoryA(MAX_PATH, buffer);
 
@@ -113,16 +113,32 @@ string Cotizador::obtenerPath() {
 }
 
 float Cotizador::cotizarTarjetaPVC() {
-    // Obtenemos el path del archivo
+    // Seteamos el path del archivo
     string path = obtenerPath() + string("\\INIT\\precios.ini");
 
     TarjetaPVC tarjeta = {0, 0.0, 0};
+
+    int sobCantidad = 0;
 
     // Seteamos cantidad y doblefaz
     cout << "Ingrese la cantidad: "; cin >> tarjeta.cantidad;
     cout << "Ingrese si es doble faz (1 = Si, 0 = No): "; cin >> tarjeta.dobleFaz;
 
-    string key = "U" + to_string(tarjeta.cantidad);
+    // FILTROS (EN PROCESO)
+    if(tarjeta.cantidad < 10)                                           // < 10
+        sobCantidad = tarjeta.cantidad - (tarjeta.cantidad - 1);
+    else if(tarjeta.cantidad < 100)                                     // < 100
+        sobCantidad = tarjeta.cantidad - (tarjeta.cantidad % 10);
+    else if(tarjeta.cantidad < 1000)                                    // < 1000
+        sobCantidad = tarjeta.cantidad - (tarjeta.cantidad % 100);
+    else if(tarjeta.cantidad < 100000)                                    // < 2000
+        sobCantidad = tarjeta.cantidad - (tarjeta.cantidad % 1000);
+
+    // DEBUG - Mostramos el sobrante de la cantidad y cantidad
+    cout << "Restos de cantidad: " << sobCantidad << endl;
+    cout << "Cantidad: " << tarjeta.cantidad << endl;
+
+    string key = "U" + to_string(sobCantidad);
 
     if(tarjeta.dobleFaz)
         key += "DF";
@@ -140,6 +156,11 @@ float Cotizador::cotizarTarjetaPVC() {
     file.read(precios);
     
     string value = precios["TarjetaPVC"].get(key);
+
+    if(value == ""){
+        cout << "No se encontro el valor" << endl;
+    } else
+        cout << "Se encontro el valor" << endl;
 
     // DEBUG - Mostramos si obtuvo el valor
     cout << value << endl;

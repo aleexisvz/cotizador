@@ -5,10 +5,11 @@
 using namespace std;
 
 int main() {
-    float aux = 9439 % 10;
-    
+    int x, y;
+    cout << "Ingrese el numero x: "; cin >> x;
+    cout << "Ingrese el numero y: "; cin >> y;
 
-    cout << aux << endl;
+    cout << "El resultado de la suma es: " << x % y << endl;
 
     return 0;
 }
