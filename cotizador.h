@@ -1,9 +1,15 @@
-// Cotizador de cortes AJI S.A en base a cotizacones del dolar
-
 #ifndef COTIZADOR_H
 #define COTIZADOR_H
 
+// USER INCLUDES
 #include "date.h"
+#include "ini.h"
+
+// SYSTEM INCLUDES
+
+// NAMESPACES
+using namespace std;
+using namespace mINI;
 
 struct PrecioDolar {
     Date fecha;
@@ -12,6 +18,12 @@ struct PrecioDolar {
 
 struct Sticker {
     float costoPlancha, costoInicio, cantidad, cantidadPlancha;
+};
+
+struct TarjetaPVC {
+    int cantidad;
+    float precio;
+    bool dobleFaz;
 };
 
 class Cotizador {
@@ -39,10 +51,16 @@ class Cotizador {
 
         // METODOS
         Sticker crearSticker();
+        string obtenerPath();
         float cotizarCortes(float, float, int);
+
+        // COTIZAR STICKERS
         float cotizarSticker();
         float cotizarStickerVinilo();
         float cotizarStickerMetalizado();
+
+        // COTIZAR TARJETAS
+        float cotizarTarjetaPVC();
 };
 
 #endif

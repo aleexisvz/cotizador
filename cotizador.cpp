@@ -2,6 +2,8 @@
 #include<iostream>
 #include<stdlib.h>
 #include<cmath>
+#include<sstream>
+#include<windows.h>
 
 // USER INCLUDES
 #include "cotizador.h"
@@ -44,8 +46,6 @@ float Cotizador::cotizarCortes(float _cotizacionAnterior, float _cotizacionActua
 
     return round(cotizacion * _cantidad);
 }
-
-
 
 float Cotizador::cotizarSticker() {
     float precio = 0.0;
@@ -104,10 +104,63 @@ Sticker Cotizador::crearSticker() {
     return sticker;
 }
 
+string Cotizador::obtenerPath() {
+    // Obtenemos el path del archivo
+    char buffer[MAX_PATH];
+    GetCurrentDirectoryA(MAX_PATH, buffer);
+
+    return buffer;
+}
+
+float Cotizador::cotizarTarjetaPVC() {
+    // Obtenemos el path del archivo
+    string path = obtenerPath() + string("\\INIT\\precios.ini");
+
+    TarjetaPVC tarjeta = {0, 0.0, 0};
+
+    // Seteamos cantidad y doblefaz
+    cout << "Ingrese la cantidad: "; cin >> tarjeta.cantidad;
+    cout << "Ingrese si es doble faz (1 = Si, 0 = No): "; cin >> tarjeta.dobleFaz;
+
+    string key = "U" + to_string(tarjeta.cantidad);
+
+    if(tarjeta.dobleFaz)
+        key += "DF";
+    else
+        key += "SF";
+
+    // DEBUG - Mostramos la key
+    cout << "Key: " << key << endl;
+    
+    // Cargamos el archivo, y creamos la estructura
+    INIFile file(path);
+    INIStructure precios;
+
+    // Leemos el archivo
+    file.read(precios);
+    
+    string value = precios["TarjetaPVC"].get(key);
+
+    // DEBUG - Mostramos si obtuvo el valor
+    cout << value << endl;
+
+    istringstream(value) >> tarjeta.precio;
+
+    // Calculamos el valor
+    tarjeta.precio = tarjeta.precio * tarjeta.cantidad;
+
+    // DEBUG - Mostramos el precio
+    cout << tarjeta.precio << endl;
+
+    tarjeta = {tarjeta.cantidad, tarjeta.precio, tarjeta.dobleFaz};
+
+    return tarjeta.precio;
+}
+
 int main() {
     Cotizador cotizador = Cotizador(20.0, 21.0, 100);
 
-    cout << cotizador.cotizarStickerMetalizado() << endl;
+    cotizador.cotizarTarjetaPVC();
 
     system("pause");
     return 0;
