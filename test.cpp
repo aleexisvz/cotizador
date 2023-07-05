@@ -5,12 +5,9 @@
 using namespace std;
 
 int main() {
-    int x, y;
-    cout << "Ingrese el numero x: "; cin >> x;
-    cout << "Ingrese el numero y: "; cin >> y;
-
-    cout << "El resultado de la suma es: " << x % y << endl;
-
+	float x = 12560 * 183;
+	cout << x << endl;
+   
     return 0;
 }
 

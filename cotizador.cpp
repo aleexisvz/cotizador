@@ -132,7 +132,7 @@ float Cotizador::cotizarTarjetaPVC() {
     else if(tarjeta.cantidad < 1000)                                    // < 1000
         sobCantidad = tarjeta.cantidad - (tarjeta.cantidad % 100);
     else if(tarjeta.cantidad < 100000)                                    // < 2000
-        sobCantidad = tarjeta.cantidad - (tarjeta.cantidad % 1000);
+        sobCantidad = tarjeta.cantidad - (tarjeta.cantidad % 10000);
 
     // DEBUG - Mostramos el sobrante de la cantidad y cantidad
     cout << "Restos de cantidad: " << sobCantidad << endl;
@@ -157,18 +157,13 @@ float Cotizador::cotizarTarjetaPVC() {
     
     string value = precios["TarjetaPVC"].get(key);
 
-    if(value == ""){
-        cout << "No se encontro el valor" << endl;
-    } else
-        cout << "Se encontro el valor" << endl;
-
     // DEBUG - Mostramos si obtuvo el valor
     cout << value << endl;
 
     istringstream(value) >> tarjeta.precio;
 
     // Calculamos el valor
-    tarjeta.precio = tarjeta.precio * tarjeta.cantidad;
+    tarjeta.precio *= tarjeta.cantidad;
 
     // DEBUG - Mostramos el precio
     cout << tarjeta.precio << endl;
