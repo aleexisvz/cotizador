@@ -22,7 +22,7 @@ struct Sticker {
 
 struct TarjetaPVC {
     int cantidad;
-    float precio;
+    long precio;
     bool dobleFaz;
 };
 
@@ -60,7 +60,7 @@ class Cotizador {
         float cotizarStickerMetalizado();
 
         // COTIZAR TARJETAS
-        float cotizarTarjetaPVC();
+        long cotizarTarjetaPVC();
 };
 
 #endif

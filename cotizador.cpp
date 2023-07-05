@@ -112,7 +112,7 @@ string Cotizador::obtenerPath() {
     return buffer;
 }
 
-float Cotizador::cotizarTarjetaPVC() {
+long Cotizador::cotizarTarjetaPVC() {
     // Seteamos el path del archivo
     string path = obtenerPath() + string("\\INIT\\precios.ini");
 
