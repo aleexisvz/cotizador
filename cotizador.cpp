@@ -37,7 +37,7 @@ void Cotizador::setCotizacionActual(float _cotizacionActual) { cotizacionActual 
 void Cotizador::setCantidad(int _cantidad) { cantidad = _cantidad; }
 void Cotizador::setPrecio(float _precio) { precio = _precio; }
 
-// METODOS
+// COTIZADORES
 float Cotizador::cotizarCortes(float _cotizacionAnterior, float _cotizacionActual, int _cantidad) {
     cotizacionAnterior = _cotizacionAnterior;
     cotizacionActual = _cotizacionActual;
@@ -90,6 +90,79 @@ float Cotizador::cotizarStickerMetalizado() {
     return precio;
 }
 
+long Cotizador::cotizarTarjetaPVC() {
+    TarjetaPVC tarjeta;
+    int sobCantidad = 0;
+    long cvUnidad, cvTotal;
+    float costoInicio;
+
+    // Seteamos cantidad y doblefaz
+    cout << "Ingrese la cantidad: "; cin >> tarjeta.cantidad;
+    cout << "Ingrese si es doble faz (1 = Si, 0 = No): "; cin >> tarjeta.dobleFaz;
+    cout << "Cuantos campos variables tiene: "; cin >> tarjeta.campoVariable;
+    cout << "Cuantas fotos variables tiene: "; cin >> tarjeta.fotoVariable;
+
+    // FILTROS (EN PROCESO)
+    if(tarjeta.cantidad < 10)                                           // < 10
+        sobCantidad = tarjeta.cantidad - (tarjeta.cantidad - 1);
+    else if(tarjeta.cantidad < 100)                                     // < 100
+        sobCantidad = tarjeta.cantidad - (tarjeta.cantidad % 10);
+    else if(tarjeta.cantidad < 1000)                                    // < 1000
+        sobCantidad = tarjeta.cantidad - (tarjeta.cantidad % 100);
+    else if(tarjeta.cantidad < 100000)                                  // < 100000
+        sobCantidad = tarjeta.cantidad - (tarjeta.cantidad % 10000);
+
+    string key = "U" + to_string(sobCantidad);
+
+    if(tarjeta.dobleFaz)
+        key += "DF";
+    else
+        key += "SF";
+    
+    string value = cargar("TarjetaPVC", key);
+
+    // DEBUG - Mostramos si obtuvo el valor
+    cout << "$" << value << endl;
+
+    istringstream(value) >> tarjeta.precio;
+
+    // Calculamos el valor
+    tarjeta.precio *= tarjeta.cantidad;
+
+    // Agregamos el precio de los campos variables
+    if(tarjeta.campoVariable > 0) {
+        key = "U" + to_string(sobCantidad);
+
+        value = cargar("CampoVariable", key);
+        istringstream(value) >> cvUnidad;
+        value = cargar("CostoInicio", "CampoVariable");
+        istringstream(value) >> costoInicio;
+
+        tarjeta.precio += (cvUnidad * tarjeta.campoVariable * tarjeta.cantidad) + costoInicio;
+    }
+
+    // Agregamos el precio de las fotos variables
+    if(tarjeta.fotoVariable > 0) {
+        key = "U" + to_string(sobCantidad);
+
+        value = cargar("FotoVariable", key);
+        istringstream(value) >> cvUnidad;
+        value = cargar("CostoInicio", "FotoVariable");
+        istringstream(value) >> costoInicio;
+
+        tarjeta.precio += (cvUnidad * tarjeta.fotoVariable * tarjeta.cantidad) + costoInicio;
+    }
+
+    // DEBUG - Mostramos el precio
+    cout << "$" << tarjeta.precio << endl;
+
+    tarjeta = {tarjeta.cantidad, tarjeta.precio, tarjeta.dobleFaz};
+
+    return tarjeta.precio;
+}
+
+// UTILES
+
 // Seteamos los datos y devolvemos la estructura
 Sticker Cotizador::crearSticker() {
     float costoPlancha, costoInicio, cantidad, cantidadPlancha;
@@ -112,42 +185,10 @@ string Cotizador::obtenerPath() {
     return buffer;
 }
 
-long Cotizador::cotizarTarjetaPVC() {
+string Cotizador::cargar(string _campo, string _key) {
     // Seteamos el path del archivo
     string path = obtenerPath() + string("\\INIT\\precios.ini");
 
-    TarjetaPVC tarjeta = {0, 0.0, 0};
-
-    int sobCantidad = 0;
-
-    // Seteamos cantidad y doblefaz
-    cout << "Ingrese la cantidad: "; cin >> tarjeta.cantidad;
-    cout << "Ingrese si es doble faz (1 = Si, 0 = No): "; cin >> tarjeta.dobleFaz;
-
-    // FILTROS (EN PROCESO)
-    if(tarjeta.cantidad < 10)                                           // < 10
-        sobCantidad = tarjeta.cantidad - (tarjeta.cantidad - 1);
-    else if(tarjeta.cantidad < 100)                                     // < 100
-        sobCantidad = tarjeta.cantidad - (tarjeta.cantidad % 10);
-    else if(tarjeta.cantidad < 1000)                                    // < 1000
-        sobCantidad = tarjeta.cantidad - (tarjeta.cantidad % 100);
-    else if(tarjeta.cantidad < 100000)                                    // < 2000
-        sobCantidad = tarjeta.cantidad - (tarjeta.cantidad % 10000);
-
-    // DEBUG - Mostramos el sobrante de la cantidad y cantidad
-    cout << "Restos de cantidad: " << sobCantidad << endl;
-    cout << "Cantidad: " << tarjeta.cantidad << endl;
-
-    string key = "U" + to_string(sobCantidad);
-
-    if(tarjeta.dobleFaz)
-        key += "DF";
-    else
-        key += "SF";
-
-    // DEBUG - Mostramos la key
-    cout << "Key: " << key << endl;
-    
     // Cargamos el archivo, y creamos la estructura
     INIFile file(path);
     INIStructure precios;
@@ -155,22 +196,7 @@ long Cotizador::cotizarTarjetaPVC() {
     // Leemos el archivo
     file.read(precios);
     
-    string value = precios["TarjetaPVC"].get(key);
-
-    // DEBUG - Mostramos si obtuvo el valor
-    cout << value << endl;
-
-    istringstream(value) >> tarjeta.precio;
-
-    // Calculamos el valor
-    tarjeta.precio *= tarjeta.cantidad;
-
-    // DEBUG - Mostramos el precio
-    cout << tarjeta.precio << endl;
-
-    tarjeta = {tarjeta.cantidad, tarjeta.precio, tarjeta.dobleFaz};
-
-    return tarjeta.precio;
+    return precios[_campo].get(_key);
 }
 
 int main() {
