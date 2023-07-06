@@ -178,6 +178,18 @@ long Cotizador::cotizarTarjetaPVC() {
         tarjeta.precio += (cvUnidad * tarjeta.cantidad) + costoInicio;
     }
 
+    // Agregamos el precio del sector firmable
+    if(tarjeta.sectorFirmable > 0) {
+        key = "U" + to_string(sobCantidad);
+
+        value = cargar("SectorFirmable", key);
+        istringstream(value) >> cvUnidad;
+        value = cargar("CostoInicio", "SectorFirmable");
+        istringstream(value) >> costoInicio;
+
+        tarjeta.precio += (cvUnidad * tarjeta.sectorFirmable * tarjeta.cantidad) + costoInicio;
+    }
+
     // DEBUG - Mostramos el precio
     cout << "$" << tarjeta.precio << endl;
 

@@ -21,7 +21,7 @@ struct Sticker {
 };
 
 struct TarjetaPVC {
-    int cantidad, campoVariable, fotoVariable, relieve, brilloSectorizado;
+    int cantidad, campoVariable, fotoVariable, relieve, brilloSectorizado, sectorFirmable;
     long precio;
     bool dobleFaz;
 };
