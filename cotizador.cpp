@@ -101,6 +101,7 @@ long Cotizador::cotizarTarjetaPVC() {
     cout << "Ingrese si es doble faz (1 = Si, 0 = No): "; cin >> tarjeta.dobleFaz;
     cout << "Cuantos campos variables tiene: "; cin >> tarjeta.campoVariable;
     cout << "Cuantas fotos variables tiene: "; cin >> tarjeta.fotoVariable;
+    cout << "Tiene relieve (1 = Si, 0 = No): "; cin >> tarjeta.relieve;
 
     // FILTROS (EN PROCESO)
     if(tarjeta.cantidad < 10)                                           // < 10
@@ -151,6 +152,30 @@ long Cotizador::cotizarTarjetaPVC() {
         istringstream(value) >> costoInicio;
 
         tarjeta.precio += (cvUnidad * tarjeta.fotoVariable * tarjeta.cantidad) + costoInicio;
+    }
+
+    // Agregamos el precio del relieve
+    if(tarjeta.relieve > 0) {
+        key = "U" + to_string(sobCantidad);
+
+        value = cargar("Relieve", key);
+        istringstream(value) >> cvUnidad;
+        value = cargar("CostoInicio", "Relieve");
+        istringstream(value) >> costoInicio;
+
+        tarjeta.precio += (cvUnidad * tarjeta.cantidad) + costoInicio;
+    }
+
+    // Agregamos el precio del brillo sectorizado
+    if(tarjeta.brilloSectorizado > 0) {
+        key = "U" + to_string(sobCantidad);
+
+        value = cargar("BrilloSectorizado", key);
+        istringstream(value) >> cvUnidad;
+        value = cargar("CostoInicio", "BrilloSectorizado");
+        istringstream(value) >> costoInicio;
+
+        tarjeta.precio += (cvUnidad * tarjeta.cantidad) + costoInicio;
     }
 
     // DEBUG - Mostramos el precio
