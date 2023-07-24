@@ -187,8 +187,9 @@ long Cotizador::cotizarTarjetaPVC() {
 Sticker Cotizador::crearSticker() {
     float costoPlancha, costoInicio, cantidad, cantidadPlancha;
 
-    cout << "Ingrese el costo de la plancha: "; cin >> costoPlancha;
-    cout << "Ingrese el costo de inicio: "; cin >> costoInicio;
+    costoPlancha = stof(cargar("Sticker", "CostoPlancha"));
+    costoInicio = stof(cargar("Sticker", "CostoInicio"));
+
     cout << "Ingrese la cantidad: "; cin >> cantidad;
     cout << "Ingrese la cantidad por plancha: "; cin >> cantidadPlancha;
 
