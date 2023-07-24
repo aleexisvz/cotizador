@@ -46,6 +46,8 @@ int main() {
                 cout << "Se cotizaran las etiquetas" << endl;
                 showMenu = true;
                 size = sizeof(opcionesSticker) / sizeof(opcionesSticker[0]);
+
+                // Mostramos el menu de stickers
                 opt = createMenu(opcionesSticker, size, showMenu);
                 
                 switch(opt) {
