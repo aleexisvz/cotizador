@@ -12,41 +12,10 @@ using namespace std;
 
 // CONSTRUCTORES
 Cotizador::Cotizador() {
-    cotizacionAnterior = 0.0;
-    cotizacionActual = 0.0;
-    cantidad = 0;
-    precio = 0.0;
+
 }
-
-Cotizador::Cotizador(float _cotizacionAnterior, float _cotizacionActual, int _cantidad) {
-    cotizacionAnterior = _cotizacionAnterior;
-    cotizacionActual = _cotizacionActual;
-    cantidad = _cantidad;
-    precio = cotizarCortes(cotizacionAnterior, cotizacionActual, cantidad);
-}
-
-// GETTERS
-float Cotizador::getCotizacionAnterior() { return cotizacionAnterior; }
-float Cotizador::getCotizacionActual() { return cotizacionActual; }
-int Cotizador::getCantidad() { return cantidad; }
-float Cotizador::getPrecio() { return precio; }
-
-// SETTERS
-void Cotizador::setCotizacionAnterior(float _cotizacionAnterior) { cotizacionAnterior = _cotizacionAnterior; }
-void Cotizador::setCotizacionActual(float _cotizacionActual) { cotizacionActual = _cotizacionActual; }
-void Cotizador::setCantidad(int _cantidad) { cantidad = _cantidad; }
-void Cotizador::setPrecio(float _precio) { precio = _precio; }
 
 // COTIZADORES
-float Cotizador::cotizarCortes(float _cotizacionAnterior, float _cotizacionActual, int _cantidad) {
-    cotizacionAnterior = _cotizacionAnterior;
-    cotizacionActual = _cotizacionActual;
-    cantidad = _cantidad;
-    float cotizacion = ((cotizacionActual / cotizacionAnterior) * 1.05) * 319;
-
-    return round(cotizacion * _cantidad);
-}
-
 float Cotizador::cotizarSticker() {
     float precio = 0.0;
 
@@ -91,19 +60,35 @@ float Cotizador::cotizarStickerMetalizado() {
 }
 
 long Cotizador::cotizarTarjetaPVC() {
+    // DECLARACIONES
     TarjetaPVC tarjeta;
     int sobCantidad = 0;
     long cvUnidad, cvTotal;
     float costoInicio;
+    bool adicionales;
+
+    system("cls");
 
     // Seteamos cantidad y doblefaz
     cout << "Ingrese la cantidad: "; cin >> tarjeta.cantidad;
     cout << "Ingrese si es doble faz (1 = Si, 0 = No): "; cin >> tarjeta.dobleFaz;
-    cout << "Cuantos campos variables tiene: "; cin >> tarjeta.campoVariable;
-    cout << "Cuantas fotos variables tiene: "; cin >> tarjeta.fotoVariable;
-    cout << "Tiene relieve (1 = Si, 0 = No): "; cin >> tarjeta.relieve;
+    cout << "Tiene adicionales? (1 = Si, 0 = No): "; cin >> adicionales;
 
-    // FILTROS (EN PROCESO)
+    if(adicionales) {
+        cout << "Cuantos campos variables tiene: "; cin >> tarjeta.campoVariable;
+        cout << "Cuantas fotos variables tiene: "; cin >> tarjeta.fotoVariable;
+        cout << "Tiene brillo sectorizado (1 = Si, 0 = No): "; cin >> tarjeta.brilloSectorizado;
+        cout << "Tiene sector firmable (1 = Si, 0 = No): "; cin >> tarjeta.sectorFirmable;
+        cout << "Tiene relieve (1 = Si, 0 = No): "; cin >> tarjeta.relieve;
+    } else {
+        tarjeta.campoVariable = 0;
+        tarjeta.fotoVariable = 0;
+        tarjeta.brilloSectorizado = 0;
+        tarjeta.sectorFirmable = 0;
+        tarjeta.relieve = 0;
+    }
+
+    // FILTROS
     if(tarjeta.cantidad < 10)                                           // < 10
         sobCantidad = tarjeta.cantidad - (tarjeta.cantidad - 1);
     else if(tarjeta.cantidad < 100)                                     // < 100
@@ -119,12 +104,10 @@ long Cotizador::cotizarTarjetaPVC() {
         key += "DF";
     else
         key += "SF";
+
+    cout << "Key: " << key << endl;
     
     string value = cargar("TarjetaPVC", key);
-
-    // DEBUG - Mostramos si obtuvo el valor
-    cout << "$" << value << endl;
-
     istringstream(value) >> tarjeta.precio;
 
     // Calculamos el valor
@@ -191,7 +174,7 @@ long Cotizador::cotizarTarjetaPVC() {
     }
 
     // DEBUG - Mostramos el precio
-    cout << "$" << tarjeta.precio << endl;
+    cout << "TOTAL: $" << tarjeta.precio << endl;
 
     tarjeta = {tarjeta.cantidad, tarjeta.precio, tarjeta.dobleFaz};
 
@@ -224,7 +207,9 @@ string Cotizador::obtenerPath() {
 
 string Cotizador::cargar(string _campo, string _key) {
     // Seteamos el path del archivo
-    string path = obtenerPath() + string("\\INIT\\precios.ini");
+    string path_actual = obtenerPath();
+    size_t separador = path_actual.find_last_of("\\");
+    string path = path_actual.substr(0, separador) + "\\INIT\\precios.ini";
 
     // Cargamos el archivo, y creamos la estructura
     INIFile file(path);
@@ -234,13 +219,4 @@ string Cotizador::cargar(string _campo, string _key) {
     file.read(precios);
     
     return precios[_campo].get(_key);
-}
-
-int main() {
-    Cotizador cotizador = Cotizador(20.0, 21.0, 100);
-
-    cotizador.cotizarTarjetaPVC();
-
-    system("pause");
-    return 0;
 }
