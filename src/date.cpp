@@ -34,11 +34,3 @@ Date::Date(int _day, int _month, int _year) {
 int Date::getDay() { return day; }
 int Date::getMonth() { return month; }
 int Date::getYear() { return year; }
-
-int main() {
-    Date date(22052023);
-
-    cout << "Fecha: " << date.getDay() << "/" << date.getMonth() << "/" << date.getYear() << endl;
-    
-    return 0;
-}

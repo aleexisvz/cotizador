@@ -4,6 +4,7 @@
 #include<cmath>
 #include<sstream>
 #include<windows.h>
+#include<locale>
 
 // USER INCLUDES
 #include "cotizador.h"
@@ -95,8 +96,8 @@ long Cotizador::cotizarTarjetaPVC() {
         sobCantidad = tarjeta.cantidad - (tarjeta.cantidad % 10);
     else if(tarjeta.cantidad < 1000)                                    // < 1000
         sobCantidad = tarjeta.cantidad - (tarjeta.cantidad % 100);
-    else if(tarjeta.cantidad < 100000)                                  // < 100000
-        sobCantidad = tarjeta.cantidad - (tarjeta.cantidad % 10000);
+    else if(tarjeta.cantidad > 1000)                                  // < 100000
+        sobCantidad = tarjeta.cantidad - (tarjeta.cantidad % 1000);
 
     string key = "U" + to_string(sobCantidad);
 
@@ -173,8 +174,19 @@ long Cotizador::cotizarTarjetaPVC() {
         tarjeta.precio += (cvUnidad * tarjeta.sectorFirmable * tarjeta.cantidad) + costoInicio;
     }
 
+    // Separador de miles
+    long long int precio_long = tarjeta.precio;
+    locale loc("");
+    const numpunct<char>& punct = use_facet<numpunct<char>>(loc);
+    char separador = punct.thousands_sep();
+    string formatted = to_string(precio_long);
+
+    for (int i = formatted.size() - 3; i > 0; i -= 3) {
+        formatted.insert(i, 1, separador);
+    }
+
     // DEBUG - Mostramos el precio
-    cout << "TOTAL: $" << tarjeta.precio << endl;
+    cout << "TOTAL: $" << formatted << endl;
 
     tarjeta = {tarjeta.cantidad, tarjeta.precio, tarjeta.dobleFaz};
 
