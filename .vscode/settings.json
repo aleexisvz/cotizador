@@ -4,6 +4,8 @@
         "iostream": "cpp",
         "xstring": "cpp",
         "ostream": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "string": "cpp",
+        "xlocbuf": "cpp"
     }
 }

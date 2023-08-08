@@ -60,7 +60,7 @@ float Cotizador::cotizarStickerMetalizado() {
     return precio;
 }
 
-long Cotizador::cotizarTarjetaPVC() {
+TarjetaPVC Cotizador::cotizarTarjetaPVC() {
     // DECLARACIONES
     TarjetaPVC tarjeta;
     int sobCantidad = 0;
@@ -174,8 +174,20 @@ long Cotizador::cotizarTarjetaPVC() {
         tarjeta.precio += (cvUnidad * tarjeta.sectorFirmable * tarjeta.cantidad) + costoInicio;
     }
 
+    // FORMATEAMOS EL PRECIO
+    string formatted = formatear(tarjeta.precio);
+
+    // DEBUG - Mostramos el precio
+    cout << "TOTAL: $" << formatted << endl;
+
+    return tarjeta;
+}
+
+// UTILES
+
+string Cotizador::formatear(long _valorAFormatear) {
     // Separador de miles
-    long long int precio_long = tarjeta.precio;
+    long long int precio_long = _valorAFormatear;
     locale loc("");
     const numpunct<char>& punct = use_facet<numpunct<char>>(loc);
     char separador = punct.thousands_sep();
@@ -185,15 +197,8 @@ long Cotizador::cotizarTarjetaPVC() {
         formatted.insert(i, 1, separador);
     }
 
-    // DEBUG - Mostramos el precio
-    cout << "TOTAL: $" << formatted << endl;
-
-    tarjeta = {tarjeta.cantidad, tarjeta.precio, tarjeta.dobleFaz};
-
-    return tarjeta.precio;
+    return formatted;
 }
-
-// UTILES
 
 // Seteamos los datos y devolvemos la estructura
 Sticker Cotizador::crearSticker() {

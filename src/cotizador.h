@@ -36,6 +36,7 @@ class Cotizador {
         Sticker crearSticker();
         string obtenerPath();
         string cargar(string, string);
+        string formatear(long);
 
         // COTIZAR STICKERS
         float cotizarSticker();
@@ -43,7 +44,7 @@ class Cotizador {
         float cotizarStickerMetalizado();
 
         // COTIZAR TARJETAS
-        long cotizarTarjetaPVC();
+        TarjetaPVC cotizarTarjetaPVC();
         long cotizarTarjetaPVC(bool);
 };
 
